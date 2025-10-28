@@ -5,17 +5,17 @@ from colorama import Fore, Style, init
 def find_exported_components(manifest_content):
     # Regex patterns to match exported components
     patterns = {
-        'activity': re.compile(r'<activity[^>]*android:exported="true"[^>]*android:name="(?!com\.google\.|com\.android\.|androidx\.|com\.amazon\.)([^"]*)"[^>]*>'),
-        'service': re.compile(r'<service[^>]*android:exported="true"[^>]*android:name="(?!com\.google\.|com\.android\.|androidx\.|com\.amazon\.)([^"]*)"[^>]*>'),
-        'receiver': re.compile(r'<receiver[^>]*android:exported="true"[^>]*android:name="(?!com\.google\.|com\.android\.|androidx\.|com\.amazon\.)([^"]*)"[^>]*>'),
-        'provider': re.compile(r'<provider[^>]*android:exported="true"[^>]*android:name="(?!com\.google\.|com\.android\.|androidx\.|com\.amazon\.)([^"]*)"[^>]*>')
+        'activity': re.compile(r'<activity[^>]*android:exported="true"[^>]*android:name="([^"]*)"[^>]*>'),
+        'service': re.compile(r'<service[^>]*android:exported="true"[^>]*android:name="([^"]*)"[^>]*>'),
+        'receiver': re.compile(r'<receiver[^>]*android:exported="true"[^>]*android:name="([^"]*)"[^>]*>'),
+        'provider': re.compile(r'<provider[^>]*android:exported="true"[^>]*android:name="([^"]*)"[^>]*>')
     }
 
     results = {
         'activity': [],
         'service': [],
         'receiver': [],
-        'provider': []
+        'provider': [],
     }
 
     # Find all matches for each component type
@@ -30,12 +30,12 @@ def print_results(results):
         'activity': Fore.RED,
         'service': Fore.GREEN,
         'receiver': Fore.WHITE,
-        'provider': Fore.BLUE
+        'provider': Fore.BLUE,
     }
 
     for component, names in results.items():
         for name in names:
-            print(f'{Style.BRIGHT}{colors[component]}{component.upper()} FOUND: {name}{Style.RESET_ALL}')
+            print(f'{Style.BRIGHT}{colors[component]}{"EXPORTED " + component.upper()} FOUND: {name}{Style.RESET_ALL}')
 
 if __name__ == "__main__":
     init(autoreset=True)  # Initialize colorama
