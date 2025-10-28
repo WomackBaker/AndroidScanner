@@ -222,60 +222,77 @@ FOUND 'root-path' WITH PATH='/' IN res/xml/provider_paths.xml
 
 ## 🛠️ Project Structure
 
-```
-AndroidScanner/
-├── apk_scanner.py            # Python automation script (Cross-platform)
-├── apk_scanner.ps1           # PowerShell automation script (Windows)
-├── apk_scanner.sh             # Bash automation script (Linux/macOS)
-├── apktool.jar                # APK decompiler tool
-├── apktool.bat                # Apktool launcher (Windows)
-├── exported.py                # Exported components scanner
-├── customactions.py           # Custom actions scanner
-├── findkeys.py                # Secrets and credentials scanner
-├── findendpoints.py           # URL and endpoint scanner
-├── permissions.py             # Permissions analyzer
-├── providerRoot.py            # FileProvider vulnerability scanner
-├── findTests.py               # Intent security scanner
-├── requirements.txt           # Python dependencies
-└── README.md                 # This file
+# AndroidScanner
+
+AndroidScanner is a small collection of Python and shell/PowerShell helper scripts to perform automated, static checks against Android APKs. It decompiles APKs (via apktool) and searches the decompiled output for common issues such as exported components, hardcoded secrets, API endpoints, provider misconfigurations, and unsafe Intent handling.
+
+## Quick start (Windows / PowerShell)
+
+1. Install Python 3.7+ and Java (JDK) if you don't already have them.
+2. From the project root, install Python dependencies:
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-## 🧪 Testing
+3. Run the scanner on a single APK (PowerShell):
 
-To test the scanner with sample APKs:
+```powershell
+# analyze single APK
+python apk_scanner.py "C:\path\to\app.apk"
 
-1. Download a test APK (ensure you have permission to analyze it)
-2. Run the scanner:
-```bash
-./apk_scanner.sh /path/to/test.apk
+# analyze all APKs in a folder
+python apk_scanner.py "C:\path\to\apks\folder"
+
+# write report to file
+python apk_scanner.py --report security_report.txt "C:\path\to\app.apk"
 ```
 
-## 🤝 Contributing
+Notes:
+- The repository includes `apktool.bat` and `apktool.jar` for convenience on Windows. Ensure Java is on your PATH.
+- The scripts are cross-platform; on Linux/macOS use `python3` and the included `apk_scanner.sh` when preferred.
 
-Contributions are welcome! Please feel free to submit a Pull Request. Areas for improvement:
+## What this repo contains
 
-- Additional vulnerability detection patterns
-- Performance optimizations
-- Support for newer Android versions
-- Additional output formats (JSON, XML, etc.)
+- `apk_scanner.py` — Python entry-point that orchestrates decompilation and runs the small scanners
+- `apktool.bat` / `apktool.jar` — helper files for decompiling APKs on Windows
+- `exported.py` — finds exported Activities/Services/Receivers/Providers
+- `customactions.py` — finds custom Intent actions
+- `findkeys.py` — heuristics for hardcoded keys/secrets in code and resources
+- `findendpoints.py` — extracts URLs and API endpoints
+- `permissions.py` — analyzes requested Android permissions
+- `providerRoot.py` — detects insecure FileProvider path configs (e.g., path="/")
+- `findTests.py` — checks for unsafe Intent handling patterns
+- `requirements.txt` — Python dependencies
 
-## 📝 License
+## Design / contract (very small)
 
-This project is provided as-is for educational and security research purposes.
+- Input: a single APK file path or a directory containing APK files.
+- Output: console output with findings; optional report file when `--report` is used.
+- Error modes: missing Java/apktool or malformed APKs will surface clear error messages.
 
-## 🙏 Acknowledgments
+Edge cases to be aware of:
+- Large APKs may take longer to decompile; run-time depends on system CPU and disk.
+- False positives: heuristic searches (keys, endpoints) should be verified manually.
+- Permission to scan: only analyze APKs you own or are authorized to test.
 
-- **Apktool** - Used for APK decompilation
-- **Colorama** - Used for colored terminal output
-- All the open-source security research community
+## Development & contribution
 
-## 📧 Support
+- Run individual modules directly for development/testing, e.g.
 
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Review the code comments in individual scanner modules
-- Check the usage examples above
+```powershell
+python findkeys.py "C:\path\to\decompiled\folder"
+```
+
+- Add unit tests or detection rules as new modules or extend existing ones.
+
+## License & legal
+
+Use this tool for legitimate security research, auditing, or educational purposes only. The authors provide no warranty. Make sure you have authorization before analyzing any APKs.
 
 ---
 
-**⚠️ Disclaimer**: This tool is for legitimate security research and educational purposes only. Users are responsible for ensuring they have proper authorization before analyzing any APK files.
+If you'd like, I can also:
+- add a brief example output section,
+- add a `CONTRIBUTING.md` and a small test harness for one scanner module.
+Let me know which you'd prefer next.
